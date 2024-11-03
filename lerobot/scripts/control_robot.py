@@ -244,7 +244,7 @@ def record(
     dataset = LeRobotDataset.create(
         dataset_metadata,
         image_writer_processes=num_image_writer_processes,
-        image_writer_threads=num_image_writer_threads_per_camera,
+        image_writer_threads=num_image_writer_threads_per_camera * len(robot.cameras),
     )
 
     if not robot.is_connected:

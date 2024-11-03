@@ -255,7 +255,7 @@ class LeRobotDatasetMetadata:
         robot_type: str | None = None,
         keys: list[str] | None = None,
         image_keys: list[str] | None = None,
-        video_keys: list[str] = None,
+        video_keys: list[str] | None = None,
         shapes: dict | None = None,
         names: dict | None = None,
         use_videos: bool = True,
@@ -275,9 +275,7 @@ class LeRobotDatasetMetadata:
                 )
         elif (
             robot_type is None
-            or keys is None
-            or image_keys is None
-            or video_keys is None
+            or (keys is None and image_keys is None and video_keys is None)
             or shapes is None
             or names is None
         ):
@@ -286,7 +284,14 @@ class LeRobotDatasetMetadata:
             )
 
         if len(video_keys) > 0 and not use_videos:
-            raise ValueError()
+            raise ValueError()  # TODO(rcadene, aliberts)
+        
+        if keys is None:
+            keys = []
+        if image_keys is None:
+            image_keys = []
+        if video_keys is None:
+            video_keys = []
 
         obj.tasks, obj.stats, obj.episodes = {}, {}, []
         obj.info = create_empty_dataset_info(

@@ -266,6 +266,8 @@ class LeRobotDatasetMetadata:
         obj.root = root if root is not None else LEROBOT_HOME / repo_id
         obj.image_writer = None
 
+        obj.root.mkdir(parents=True, exist_ok=False)
+
         if robot is not None:
             robot_type, keys, image_keys, video_keys, shapes, names = _get_info_from_robot(robot, use_videos)
             if not all(cam.fps == fps for cam in robot.cameras.values()):
@@ -285,7 +287,7 @@ class LeRobotDatasetMetadata:
 
         if len(video_keys) > 0 and not use_videos:
             raise ValueError()  # TODO(rcadene, aliberts)
-        
+
         if keys is None:
             keys = []
         if image_keys is None:
@@ -778,7 +780,7 @@ class LeRobotDataset(torch.utils.data.Dataset):
         # Reset the buffer
         self.episode_buffer = self._create_episode_buffer()
 
-    def start_image_writer(self, num_processes: int = 0, num_threads: int = 1) -> None:
+    def start_image_writer(self, num_processes: int = 0, num_threads: int = 4) -> None:
         if isinstance(self.image_writer, ImageWriter):
             logging.warning(
                 "You are starting a new ImageWriter that is replacing an already exising one in the dataset."
@@ -860,7 +862,7 @@ class LeRobotDataset(torch.utils.data.Dataset):
         metadata: LeRobotDatasetMetadata,
         tolerance_s: float = 1e-4,
         image_writer_processes: int = 0,
-        image_writer_threads: int = 0,
+        image_writer_threads: int = 4,
         video_backend: str | None = None,
     ) -> "LeRobotDataset":
         """Create a LeRobot Dataset from scratch in order to record data."""
@@ -872,8 +874,7 @@ class LeRobotDataset(torch.utils.data.Dataset):
         obj.tolerance_s = tolerance_s
         obj.image_writer = None
 
-        if image_writer_processes or image_writer_threads:
-            obj.start_image_writer(image_writer_processes, image_writer_threads)
+        obj.start_image_writer(image_writer_processes, image_writer_threads)
 
         # TODO(aliberts, rcadene, alexander-soare): Merge this with OnlineBuffer/DataBuffer
         obj.episode_buffer = obj._create_episode_buffer()

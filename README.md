@@ -85,7 +85,7 @@ cd lerobot
 
 Create a virtual environment with Python 3.10 and activate it, e.g. with [`miniconda`](https://docs.anaconda.com/free/miniconda/index.html):
 ```bash
-conda create -y -n lerobot python=3.10
+conda create -y -n lerobot2 python=3.10
 conda activate lerobot
 ```
 

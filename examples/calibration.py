@@ -4,7 +4,7 @@ from lerobot.common.robot_devices.motors.configs import DynamixelMotorsBusConfig
 from lerobot.common.robot_devices.motors.dynamixel import DynamixelMotorsBus
 
 leader_config = DynamixelMotorsBusConfig(
-    port="/dev/ttyACM1",
+    port="/dev/ttyLeaderL",
     motors={
         # name: (index, model)
         "shoulder_pan": (1, "xl330-m077"),
@@ -17,7 +17,7 @@ leader_config = DynamixelMotorsBusConfig(
 )
 
 follower_config = DynamixelMotorsBusConfig(
-    port="/dev/ttyACM2",
+    port="/dev/ttyFollowerR",
     motors={
         # name: (index, model)
         "shoulder_pan": (1, "xl430-w250"),

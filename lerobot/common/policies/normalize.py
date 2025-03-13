@@ -206,7 +206,7 @@ class Unnormalize(nn.Module):
         # `self.buffer_observation_state["mean"]` contains `torch.tensor(state_dim)`
         stats_buffers = create_stats_buffers(features, norm_map, stats)
         for key, buffer in stats_buffers.items():
-            setattr(self, "buffer_" + key.replace(".", "_"), buffer)
+            setattr(self, "buffer_" + key.replace(".", "_"), buffer) 
 
     # TODO(rcadene): should we remove torch.no_grad?
     @torch.no_grad

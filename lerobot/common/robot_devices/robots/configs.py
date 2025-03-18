@@ -27,6 +27,7 @@ from lerobot.common.robot_devices.motors.configs import (
     DynamixelMotorsBusConfig,
     FeetechMotorsBusConfig,
     MotorsBusConfig,
+    RealmenMotorsBusConfig
 )
 
 
@@ -79,7 +80,58 @@ class ManipulatorRobotConfig(RobotConfig):
                         "Note: This feature does not yet work with robots where different follower arms have "
                         "different numbers of motors."
                     )
+@dataclass
+class DmRobotConfig(RobotConfig):
+    leader_arms: dict[str, MotorsBusConfig] = field(default_factory=lambda: {})
+    follower_arms: dict[str, MotorsBusConfig] = field(default_factory=lambda: {})
+    cameras: dict[str, CameraConfig] = field(default_factory=lambda: {})
 
+    # Optionally limit the magnitude of the relative positional target vector for safety purposes.
+    # Set this to a positive scalar to have the same value for all motors, or a list that is the same length
+    # as the number of motors in your follower arms (assumes all follower arms have the same number of
+    # motors).
+    max_relative_target: list[float] | float | None = None
+
+    # Optionally set the leader arm in torque mode with the gripper motor set to this angle. This makes it
+    # possible to squeeze the gripper and have it spring back to an open position on its own. If None, the
+    # gripper is not put in torque mode.
+    gripper_open_degree: float | None = None
+
+    mock: bool = False
+    def __setattr__(self, prop: str, val):
+        if prop == "max_relative_target" and val is not None and isinstance(val, Sequence):
+            for name in self.follower_arms:
+                if len(self.follower_arms[name].motors) != len(val):
+                    raise ValueError(
+                        f"len(max_relative_target)={len(val)} but the follower arm with name {name} has "
+                        f"{len(self.follower_arms[name].motors)} motors. Please make sure that the "
+                        f"`max_relative_target` list has as many parameters as there are motors per arm. "
+                        "Note: This feature does not yet work with robots where different follower arms have "
+                        "different numbers of motors."
+                    )
+        super().__setattr__(prop, val)
+    def __post_init__(self):
+        if self.mock:
+            for arm in self.leader_arms.values():
+                if not arm.mock:
+                    arm.mock = True
+            for arm in self.follower_arms.values():
+                if not arm.mock:
+                    arm.mock = True
+            for cam in self.cameras.values():
+                if not cam.mock:
+                    cam.mock = True
+
+        if self.max_relative_target is not None and isinstance(self.max_relative_target, Sequence):
+            for name in self.follower_arms:
+                if len(self.follower_arms[name].motors) != len(self.max_relative_target):
+                    raise ValueError(
+                        f"len(max_relative_target)={len(self.max_relative_target)} but the follower arm with name {name} has "
+                        f"{len(self.follower_arms[name].motors)} motors. Please make sure that the "
+                        f"`max_relative_target` list has as many parameters as there are motors per arm. "
+                        "Note: This feature does not yet work with robots where different follower arms have "
+                        "different numbers of motors."
+                    )
 
 @RobotConfig.register_subclass("aloha")
 @dataclass
@@ -207,7 +259,62 @@ class AlohaRobotConfig(ManipulatorRobotConfig):
 
     mock: bool = False
 
-
+@RobotConfig.register_subclass("realmen")
+@dataclass
+class RealMenRobotConfig(DmRobotConfig):
+    calibration_dir: str = ".cache/calibration/dm"
+    max_relative_target: int | None = None
+    leader_arms: dict[str, MotorsBusConfig] = field(
+        default_factory=lambda: {
+            "main": RealmenMotorsBusConfig(
+                port="/dev/ttyLeader",
+                motors={
+                    "joint1": [1, "rm75"],
+                    "joint2": [2, "rm75"],
+                    "joint3": [3, "rm75"],
+                    "joint4": [4, "rm75"],
+                    "joint5": [5, "rm75"],
+                    "joint6": [6, "rm75"],
+                    "joint7": [7, "rm75"],
+                    "gripper": [8, "sts3215"],
+                }
+            )
+        }
+    )
+    follower_arms: dict[str, MotorsBusConfig] = field(
+        default_factory=lambda: {
+            "main": RealmenMotorsBusConfig(
+                port="/dev/ttyFollower",
+                motors={
+                    "joint1": [1, "rm75"],
+                    "joint2": [2, "rm75"],
+                    "joint3": [3, "rm75"],
+                    "joint4": [4, "rm75"],
+                    "joint5": [5, "rm75"],
+                    "joint6": [6, "rm75"],
+                    "joint7": [7, "rm75"],
+                    "gripper": [8, "sts3215"],
+                }
+            )
+        }
+    )
+    cameras: dict[str, CameraConfig] = field(
+    default_factory=lambda: {
+        "laptop": OpenCVCameraConfig(
+            camera_index=0,
+            fps=30,
+            width=640,
+            height=480,
+        ),
+        "phone": OpenCVCameraConfig(
+            camera_index=2,
+            fps=30,
+            width=640,
+            height=480,
+        ),
+    }
+    )
+    mock: bool = False
 @RobotConfig.register_subclass("koch")
 @dataclass
 class KochRobotConfig(ManipulatorRobotConfig):

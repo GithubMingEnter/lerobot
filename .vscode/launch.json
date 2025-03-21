@@ -1,0 +1,136 @@
+{
+    // 使用 IntelliSense 了解相关属性。 
+    // 悬停以查看现有属性的描述。
+    // 欲了解更多信息，请访问: https://go.microsoft.com/fwlink/?linkid=830387
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Python 调试程序: 当前文件",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${file}",
+            "console": "integratedTerminal"
+        },
+        {
+            "name": "Python configure_motor",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/lerobot/scripts/configure_motor.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--port",
+                "/dev/ttyUSB0",
+                "--brand",
+                "feetech",
+                "--model",
+                "sts3215",
+                "--ID",
+                "1"
+            ]
+        },
+        {
+            "name": "Python test realmen",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/lerobot/common/robot_devices/motors/test_realmen.py",
+            "console": "integratedTerminal",
+            "args": [
+                "--port",
+                "/dev/ttyUSB0",
+                "--brand",
+                "feetech",
+                "--model",
+                "sts3215",
+                "--ID",
+                "1"
+            ]
+        },
+        {
+            "name": "Debug Teleoperate",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/lerobot/scripts/control_robot.py",
+            "args": [
+                "teleoperate",
+                "--robot-path", "${workspaceFolder}/lerobot/configs/robot/dm.yaml",
+                // "--robot-overrides"," ",
+                "--display-cameras", "0"
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Debug Teleoperate",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/lerobot/scripts/control_robot.py",
+            "args": [
+                "teleoperate",
+                "--robot-path", "${workspaceFolder}/lerobot/configs/robot/dm.yaml",
+                // "--robot-overrides"," ",
+                "--display-cameras", "0"
+            ],
+            
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": " camera Teleoperate",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/lerobot/scripts/control_robot.py",
+            "args": [
+                "teleoperate",
+                "--robot-path", "${workspaceFolder}/lerobot/configs/robot/dm.yaml",
+            ],
+            "console": "integratedTerminal",
+            "justMyCode": false
+        },
+        {
+            "name": "Python: Control Robot",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/lerobot/scripts/control_robot.py",
+            "console": "integratedTerminal",
+            "args": [
+              "record",
+              "--robot-path", "lerobot/configs/robot/dm.yaml",
+              "--fps", "30",
+              "--root", "data",
+              "--repo-id", "${env:HF_USER}/eval_act_dm_test",
+              "--tags", "dm", "tutorial", "eval",
+              "--warmup-time-s", "5",
+              "--episode-time-s", "50",
+              "--reset-time-s", "10",
+              "--num-episodes", "5",
+              "-p", "outputs/train/act_dm_test/checkpoints/last/pretrained_model",
+              "--push-to-hub", "0"
+            ],
+            "env": {
+                "HF_USER": "Swingming",  // 替换为你的 Hugging Face 用户名
+                "PYTHONPATH": "${workspaceFolder}" // 使得 Python 能够找到 lerobot 包
+            }
+        },
+        {
+            "name": "Python: Train with Hydra",
+            "type": "debugpy",
+            "request": "launch",
+            "program": "${workspaceFolder}/lerobot/scripts/train.py",
+            "args": [
+                "dataset_repo_id=Swingming/dm_test1",
+                "policy=act_dm_real",
+                "env=dm_real",
+                "hydra.run.dir=outputs/train/act_dm_test",
+                "hydra.job.name=act_dm_test",
+                "device=cuda",
+                "wandb.enable=false",
+                // "resume=True",
+            ],
+            "console": "integratedTerminal",
+            "env": {
+                "HF_USER": "Swingming",  // 替换为你的 Hugging Face 用户名
+                "PYTHONPATH": "${workspaceFolder}" // 使得 Python 能够找到 lerobot 包
+            }
+        }
+    ]
+}

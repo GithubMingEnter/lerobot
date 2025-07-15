@@ -21,10 +21,10 @@ Provide a simple way for the reviewer to try out your changes.
 
 Examples:
 ```bash
-DATA_DIR=tests/data pytest -sx tests/test_stuff.py::test_something
+pytest -sx tests/test_stuff.py::test_something
 ```
 ```bash
-python lerobot/scripts/train.py --some.option=true
+python -m lerobot.scripts.train --some.option=true
 ```
 
 ## SECTION TO REMOVE BEFORE SUBMITTING YOUR PR
